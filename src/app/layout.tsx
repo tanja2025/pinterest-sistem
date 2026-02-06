@@ -18,6 +18,10 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "PinAuto - Pinterest Automation",
   description: "Automate your Pinterest pin creation and scheduling with AI.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function RootLayout({

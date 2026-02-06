@@ -21,7 +21,7 @@ export function PinActions({ pinId, assetId, shareToken, title, description }: P
     const handlePinterestCreate = () => {
         const appUrl = window.location.origin;
         const shareUrl = `${appUrl}/p/${shareToken}`;
-        const imageUrl = `${appUrl}/api/share-image/${shareToken}`;
+        const imageUrl = `${appUrl}/api/share-image/${shareToken}.jpg`;
 
         const params = new URLSearchParams({
             url: shareUrl,

@@ -5,7 +5,8 @@ export async function GET(
     request: Request,
     { params }: { params: Promise<{ token: string }> }
 ) {
-    const { token } = await params;
+    const { token: rawToken } = await params;
+    const token = rawToken.replace(/\.(jpg|jpeg|png|webp)$/i, '');
 
     try {
         // 1. Get the asset by share_token
@@ -19,16 +20,10 @@ export async function GET(
             return new NextResponse("Image not found", { status: 404 });
         }
 
-        // 2. Fetch the image from the URL
-        const imageRes = await fetch(asset.image_url);
-        const imageBuffer = await imageRes.arrayBuffer();
-
-        // 3. Return the image with correct headers
-        return new NextResponse(imageBuffer, {
-            headers: {
-                "Content-Type": imageRes.headers.get("Content-Type") || "image/jpeg",
-                "Cache-Control": "public, max-age=31536000, immutable",
-            },
+        // Redirect directly to the Supabase public URL
+        // Pinterest handles redirects well and this is more reliable than streaming
+        return NextResponse.redirect(asset.image_url, {
+            status: 302
         });
     } catch (error) {
         console.error("Proxy error:", error);

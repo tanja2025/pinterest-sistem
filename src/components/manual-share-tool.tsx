@@ -43,7 +43,7 @@ export function ManualShareTool({ initialPin }: { initialPin: PinData | null }) 
         if (!pin) return;
         const appUrl = window.location.origin;
         const shareUrl = `${appUrl}/p/${pin.assets.share_token}`;
-        const imageUrl = `${appUrl}/api/share-image/${pin.assets.share_token}`;
+        const imageUrl = `${appUrl}/api/share-image/${pin.assets.share_token}.jpg`;
 
         const params = new URLSearchParams({
             url: shareUrl,

@@ -6,17 +6,6 @@ import { Button } from "@/components/ui/button"
 import { supabase } from "@/lib/supabase"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 
 interface DeleteAssetProps {
     assetId: string;
@@ -28,6 +17,10 @@ export function DeleteAsset({ assetId, imageUrl }: DeleteAssetProps) {
     const router = useRouter()
 
     const handleDelete = async () => {
+        if (!window.confirm("Are you sure you want to delete this asset? This will also delete all its variants.")) {
+            return;
+        }
+
         try {
             setIsDeleting(true)
 
@@ -50,7 +43,12 @@ export function DeleteAsset({ assetId, imageUrl }: DeleteAssetProps) {
             if (error) throw error
 
             toast.success("Asset deleted successfully")
-            router.push('/assets')
+
+            // If we are on the detail page, go back to assets list
+            if (window.location.pathname.includes(assetId)) {
+                router.push('/assets')
+            }
+
             router.refresh()
         } catch (error: any) {
             toast.error("Delete failed: " + error.message)
@@ -60,32 +58,18 @@ export function DeleteAsset({ assetId, imageUrl }: DeleteAssetProps) {
     }
 
     return (
-        <AlertDialog>
-            <AlertDialogTrigger asChild>
-                <Button
-                    variant="ghost"
-                    size="sm"
-                    className="h-8 w-8 p-0 text-zinc-400 hover:text-red-600 transition-colors"
-                    disabled={isDeleting}
-                >
-                    {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
-                </Button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        This action cannot be undone. This will permanently delete the image
-                        and all generated pin variants.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
-                        Delete
-                    </AlertDialogAction>
-                </AlertDialogFooter>
-            </AlertDialogContent>
-        </AlertDialog>
+        <Button
+            variant="ghost"
+            size="sm"
+            className="h-8 w-8 p-0 text-zinc-400 hover:text-red-600 transition-colors bg-white/80 dark:bg-zinc-900/80 backdrop-blur-sm rounded-full shadow-sm"
+            onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleDelete();
+            }}
+            disabled={isDeleting}
+        >
+            {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+        </Button>
     )
 }

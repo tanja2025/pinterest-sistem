@@ -4,7 +4,9 @@ const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
 });
 
-export async function analyzeImage(imageUrl: string) {
+export async function analyzeImage(imageUrl: string, customPrompt?: string) {
+    const defaultPrompt = "Analyze this image for Pinterest. Provide a JSON response with the following keys: niche (a broad category like Home Decor, Fashion, tech), keywords (a list of 10-15 relevant keywords), description (a 2-sentence visual description), and suggested_boards (3-5 board names this pin would fit into).";
+
     const response = await openai.chat.completions.create({
         model: "gpt-4o-mini",
         messages: [
@@ -13,7 +15,7 @@ export async function analyzeImage(imageUrl: string) {
                 content: [
                     {
                         type: "text",
-                        text: "Analyze this image for Pinterest. Provide a JSON response with the following keys: niche (a broad category like Home Decor, Fashion, tech), keywords (a list of 10-15 relevant keywords), description (a 2-sentence visual description), and suggested_boards (3-5 board names this pin would fit into).",
+                        text: customPrompt || defaultPrompt,
                     },
                     {
                         type: "image_url",

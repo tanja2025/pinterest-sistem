@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const firstPin = asset.pins?.[0];
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pinterest-sistem.vercel.app';
-    const proxyUrl = `${appUrl}/api/share-image/${token}`;
+    const proxyUrl = `${appUrl}/api/share-image/${token}.jpg`;
 
     return {
         title: firstPin?.title || "Check out this pin!",

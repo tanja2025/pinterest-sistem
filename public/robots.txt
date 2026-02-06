@@ -1,4 +1,7 @@
 User-agent: Pinterestbot
+User-agent: Pinterest
+Allow: /p/
+Allow: /api/share-image/
 Allow: /
 
 User-agent: *

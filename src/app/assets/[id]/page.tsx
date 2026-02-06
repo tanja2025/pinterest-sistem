@@ -6,6 +6,7 @@ import { Asset, Pin } from "@/types";
 import { CopyButton } from "@/components/copy-button";
 import { PinActions } from "@/components/pin-actions";
 import { DeleteAsset } from "@/components/delete-asset";
+import { RetryButton } from "@/components/retry-button";
 
 export const dynamic = 'force-dynamic'
 
@@ -138,18 +139,11 @@ export default async function AssetDetailPage({ params }: { params: Promise<{ id
                                         </>
                                     )}
 
-                                    <Button
-                                        onClick={async () => {
-                                            const res = await fetch('/api/analyze', {
-                                                method: 'POST',
-                                                body: JSON.stringify({ assetId: asset.id, imageUrl: asset.image_url })
-                                            });
-                                            if (res.ok) window.location.reload();
-                                        }}
-                                        className="rounded-full bg-red-600 hover:bg-red-700 text-white"
-                                    >
-                                        {asset.status === 'analyzing' ? "Wait or Force Retry" : "Try Again"}
-                                    </Button>
+                                    <RetryButton
+                                        assetId={asset.id}
+                                        imageUrl={asset.image_url}
+                                        status={asset.status}
+                                    />
                                 </div>
                             </div>
                         )}

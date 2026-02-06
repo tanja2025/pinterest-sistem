@@ -4,8 +4,10 @@ import { supabase } from "@/lib/supabase";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
+    let currentAssetId: string | null = null;
     try {
         const { assetId, imageUrl } = await req.json();
+        currentAssetId = assetId;
 
         if (!assetId || !imageUrl) {
             return NextResponse.json({ error: "Missing assetId or imageUrl" }, { status: 400 });
@@ -61,7 +63,9 @@ export async function POST(req: Request) {
     } catch (error) {
         console.error("Analysis failed:", error);
         // Fallback: mark as failed in DB so it doesn't stay analyzing
-        await supabase.from('assets').update({ status: 'failed' }).eq('id', assetId);
+        if (currentAssetId) {
+            await supabase.from('assets').update({ status: 'failed' }).eq('id', currentAssetId);
+        }
         return NextResponse.json({ error: "Process failed" }, { status: 500 });
     }
 }

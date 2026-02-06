@@ -24,31 +24,40 @@ export async function POST(req: Request) {
         `;
 
         const response = await analyzeImage(imageUrl, analysisPrompt);
+        console.log("AI Response received:", JSON.stringify(response).substring(0, 100) + "...");
+
+        if (!response || !response.pins || !Array.isArray(response.pins)) {
+            console.error("Invalid AI response structure:", response);
+            throw new Error("AI returned invalid data structure");
+        }
 
         // 2. Update asset analysis and status
-        const shareToken = Math.random().toString(36).substring(2, 15);
+        const shareToken = Math.random().toString(36).substring(2, 10);
         const { error: assetError } = await supabase
             .from('assets')
             .update({
                 analysis: {
-                    niche: response.niche,
-                    keywords: response.keywords,
-                    description: response.description,
-                    suggested_boards: response.suggested_boards
+                    niche: response.niche || 'Other',
+                    keywords: response.keywords || [],
+                    description: response.description || '',
+                    suggested_boards: response.suggested_boards || []
                 },
                 status: 'ready',
                 share_token: shareToken
             })
             .eq('id', assetId);
 
-        if (assetError) throw assetError;
+        if (assetError) {
+            console.error("Supabase Asset Update Error:", assetError);
+            throw assetError;
+        }
 
         // 3. Save Pins to database
         const pinsToInsert = response.pins.map((pin: any) => ({
             asset_id: assetId,
-            type: pin.type,
-            title: pin.title,
-            description: pin.description,
+            type: pin.type || 'SEO',
+            title: pin.title || 'Pinterest Pin',
+            description: pin.description || '',
             status: 'planned',
             board_name: response.suggested_boards?.[0] || 'Home Decor'
         }));
@@ -57,15 +66,26 @@ export async function POST(req: Request) {
             .from('pins')
             .insert(pinsToInsert);
 
-        if (pinError) throw pinError;
+        if (pinError) {
+            console.error("Supabase Pins Insert Error:", pinError);
+            throw pinError;
+        }
 
         return NextResponse.json({ success: true, pinsGenerated: pinsToInsert.length });
-    } catch (error) {
-        console.error("Analysis failed:", error);
+    } catch (error: any) {
+        console.error("ANALYSIS ROUTE CRASH:", error);
         // Fallback: mark as failed in DB so it doesn't stay analyzing
         if (currentAssetId) {
-            await supabase.from('assets').update({ status: 'failed' }).eq('id', currentAssetId);
+            try {
+                await supabase.from('assets').update({ status: 'failed' }).eq('id', currentAssetId);
+            } catch (dbError) {
+                console.error("Failed to set status to FAILED:", dbError);
+            }
         }
-        return NextResponse.json({ error: "Process failed" }, { status: 500 });
+        return NextResponse.json({
+            error: "Process failed",
+            details: error.message,
+            stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        }, { status: 500 });
     }
 }

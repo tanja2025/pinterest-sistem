@@ -118,9 +118,39 @@ export default async function AssetDetailPage({ params }: { params: Promise<{ id
                                 </CardContent>
                             </Card>
                         ))}
-                        {(!pins || pins.length === 0) && asset.status === 'analyzing' && (
-                            <div className="py-20 text-center bg-white dark:bg-zinc-900 rounded-2xl shadow-sm">
-                                <p className="text-zinc-500 italic">Generating your high-performing variants...</p>
+
+                        {(asset.status === 'analyzing' || asset.status === 'failed') && (
+                            <div className="py-20 text-center bg-white dark:bg-zinc-900 rounded-3xl shadow-sm border-2 border-dashed border-zinc-100 dark:border-zinc-800">
+                                <div className="max-w-xs mx-auto space-y-4">
+                                    {asset.status === 'analyzing' ? (
+                                        <>
+                                            <div className="w-12 h-12 bg-red-50 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto animate-pulse">
+                                                <div className="w-6 h-6 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                                            </div>
+                                            <p className="text-zinc-500 italic">AI is analyzing your image... This usually takes 5-10 seconds.</p>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <div className="w-12 h-12 bg-orange-50 dark:bg-orange-900/20 rounded-full flex items-center justify-center mx-auto text-orange-600">
+                                                <span className="text-xl font-bold">!</span>
+                                            </div>
+                                            <p className="text-zinc-500">Analysis took too long or failed.</p>
+                                        </>
+                                    )}
+
+                                    <Button
+                                        onClick={async () => {
+                                            const res = await fetch('/api/analyze', {
+                                                method: 'POST',
+                                                body: JSON.stringify({ assetId: asset.id, imageUrl: asset.image_url })
+                                            });
+                                            if (res.ok) window.location.reload();
+                                        }}
+                                        className="rounded-full bg-red-600 hover:bg-red-700 text-white"
+                                    >
+                                        {asset.status === 'analyzing' ? "Wait or Force Retry" : "Try Again"}
+                                    </Button>
+                                </div>
                             </div>
                         )}
                     </div>

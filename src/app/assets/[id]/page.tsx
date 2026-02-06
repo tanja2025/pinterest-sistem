@@ -5,6 +5,7 @@ import { Copy, Calendar, CheckCircle, ExternalLink } from "lucide-react";
 import { Asset, Pin } from "@/types";
 import { CopyButton } from "@/components/copy-button";
 import { PinActions } from "@/components/pin-actions";
+import { DeleteAsset } from "@/components/delete-asset";
 
 export const dynamic = 'force-dynamic'
 
@@ -31,8 +32,11 @@ export default async function AssetDetailPage({ params }: { params: Promise<{ id
             <div className="flex flex-col md:flex-row gap-8">
                 {/* Left: Image & Analysis */}
                 <div className="w-full md:w-1/3 space-y-6">
-                    <Card className="overflow-hidden border-none shadow-lg">
+                    <Card className="overflow-hidden border-none shadow-lg relative group">
                         <img src={asset.image_url} alt="Asset" className="w-full h-auto" />
+                        <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <DeleteAsset assetId={asset.id} imageUrl={asset.image_url} />
+                        </div>
                     </Card>
 
                     <Card className="border-none shadow-sm bg-white dark:bg-zinc-900">

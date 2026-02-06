@@ -9,15 +9,31 @@ import { useState } from "react";
 interface PinActionsProps {
     pinId: string;
     assetId: string;
+    shareToken: string;
+    title: string;
+    description: string;
 }
 
-export function PinActions({ pinId, assetId }: PinActionsProps) {
+export function PinActions({ pinId, assetId, shareToken, title, description }: PinActionsProps) {
     const [isScheduling, setIsScheduling] = useState(false);
     const [isPosting, setIsPosting] = useState(false);
 
     const handlePinterestCreate = () => {
-        window.open("https://www.pinterest.com/pin/create/", "_blank");
-        toast.success("Opened Organic Pinterest Create. Use the copy buttons to paste details!");
+        const appUrl = window.location.origin;
+        const shareUrl = `${appUrl}/p/${shareToken}`;
+        const imageUrl = `${appUrl}/api/share-image/${shareToken}`;
+
+        const params = new URLSearchParams({
+            url: shareUrl,
+            media: imageUrl,
+            description: description,
+            is_video: 'false'
+        });
+
+        const pinterestUrl = `https://www.pinterest.com/pin/create/button/?${params.toString()}`;
+
+        window.open(pinterestUrl, "_blank");
+        toast.success("Opening Pinterest Create flow!");
     };
 
     const handleSchedule = async () => {

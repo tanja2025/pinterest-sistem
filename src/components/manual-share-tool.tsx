@@ -43,7 +43,16 @@ export function ManualShareTool({ initialPin }: { initialPin: PinData | null }) 
         if (!pin) return;
         const appUrl = window.location.origin;
         const shareUrl = `${appUrl}/p/${pin.assets.share_token}`;
-        const pinterestUrl = `https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(shareUrl)}`;
+        const imageUrl = `${appUrl}/api/share-image/${pin.assets.share_token}`;
+
+        const params = new URLSearchParams({
+            url: shareUrl,
+            media: imageUrl,
+            description: pin.description,
+            is_video: 'false'
+        });
+
+        const pinterestUrl = `https://www.pinterest.com/pin/create/button/?${params.toString()}`;
 
         window.open(pinterestUrl, "_blank");
         toast.info("Opening Pinterest...", {

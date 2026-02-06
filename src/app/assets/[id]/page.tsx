@@ -104,7 +104,13 @@ export default async function AssetDetailPage({ params }: { params: Promise<{ id
                                             <CopyButton value={pin.description} />
                                         </div>
                                     </div>
-                                    <PinActions pinId={pin.id} assetId={asset.id} />
+                                    <PinActions
+                                        pinId={pin.id}
+                                        assetId={asset.id}
+                                        shareToken={asset.share_token}
+                                        title={pin.title}
+                                        description={pin.description}
+                                    />
                                 </CardContent>
                             </Card>
                         ))}

@@ -16,7 +16,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     if (!asset) return { title: "Not Found" };
 
     const firstPin = asset.pins?.[0];
-    const proxyUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/share-image/${token}`;
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://pinterest-sistem.vercel.app';
+    const proxyUrl = `${appUrl}/api/share-image/${token}`;
 
     return {
         title: firstPin?.title || "Check out this pin!",
@@ -24,9 +25,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         openGraph: {
             title: firstPin?.title,
             description: firstPin?.description,
-            images: [proxyUrl],
-            type: 'website',
+            images: [
+                {
+                    url: proxyUrl,
+                    width: 1000,
+                    height: 1500,
+                    alt: firstPin?.title,
+                }
+            ],
+            type: 'article',
         },
+        twitter: {
+            card: 'summary_large_image',
+            title: firstPin?.title,
+            description: firstPin?.description,
+            images: [proxyUrl],
+        }
     };
 }
 

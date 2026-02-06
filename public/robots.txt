@@ -1,2 +1,5 @@
+User-agent: Pinterestbot
+Allow: /
+
 User-agent: *
 Disallow: /
